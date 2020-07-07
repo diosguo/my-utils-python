@@ -1,6 +1,19 @@
+#!/usr/bin/env python3
+# -*- encoding: utf-8 -*-
+"""
+@File   :   my_utils_python\basic.py
+@Time   :   2020/7/6 16:19
+@Auther :   DiosGuo
+@Contact:   guoxuyang5@jd.com
+@Version:   0.0.1
+@Desc   :   basic
+"""
 import json
 import os
-import sys
+import logging
+import logging.handlers
+import datetime
+import pickle
 
 
 def load_json_from_file(file_path: str, encoding='utf-8'):
@@ -31,6 +44,43 @@ def save_json_to_file(obj: object, file_path: str, encoding='utf-8'):
         json.dump(obj, fou)
 
 
+def load_pkl(file_path: str):
+    with open(file_path, 'rb') as fin:
+        return pickle.load(fin)
 
 
+def save_pkl(obj, file_path: str):
+    with open(file_path, 'wb') as fou:
+        pickle.dump(obj, file_path)
 
+
+def get_logger_with_common_config(logger_name='logger', log_dir='./log'):
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.DEBUG)
+
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+
+    # Console
+    c_handler = logging.StreamHandler()
+    c_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
+    c_handler.setLevel(logging.DEBUG)
+
+    # all.log
+    rf_handler = logging.handlers.TimedRotatingFileHandler(os.path.join(log_dir, 'all.log'),
+                                                           when='midnight',
+                                                           encoding='utf-8',
+                                                           interval=1,
+                                                           backupCount=7,
+                                                           atTime=datetime.time(0, 0, 0, 0))
+    rf_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
+
+    # error.log
+    f_handler = logging.FileHandler(os.path.join(log_dir, 'error.log'), encoding='utf-8')
+    f_handler.setLevel(logging.ERROR)
+    f_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(filename)s[:%(lineno)d] - %(message)s"))
+
+    logger.addHandler(c_handler)
+    logger.addHandler(rf_handler)
+    logger.addHandler(f_handler)
+    return logger
