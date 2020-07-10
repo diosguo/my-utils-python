@@ -14,7 +14,7 @@ import logging
 import logging.handlers
 import datetime
 import pickle
-
+import time
 
 def load_json_from_file(file_path: str, encoding='utf-8'):
     """
@@ -24,7 +24,7 @@ def load_json_from_file(file_path: str, encoding='utf-8'):
     :return: a json read in object list or dict
     """
     with open(file_path, 'r', encoding=encoding) as fin:
-        return json.load(file_path)
+        return json.load(fin)
 
 
 def save_json_to_file(obj: object, file_path: str, encoding='utf-8'):
@@ -84,3 +84,22 @@ def get_logger_with_common_config(logger_name='logger', log_dir='./log'):
     logger.addHandler(rf_handler)
     logger.addHandler(f_handler)
     return logger
+
+
+def time_logger(name, logger=None):
+    def wrapper(func):
+        def temp(*args, **kwargs):
+            if logger:
+                logger.info("开始{}：".format(name))
+            else:
+                print("开始{}：".format(name))
+            start_time = time.time()
+            res = func(*args, **kwargs)
+            elapse = time.time() - start_time
+            if logger:
+                logger.info("{}结束，耗时: {}秒".format(name, elapse))
+            else:
+                print("{}结束，耗时: {}秒".format(name, elapse))
+            return res
+        return temp
+    return wrapper
