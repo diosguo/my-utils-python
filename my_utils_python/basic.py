@@ -16,6 +16,7 @@ import datetime
 import pickle
 import time
 
+
 def load_json_from_file(file_path: str, encoding='utf-8'):
     """
     Load Json data from file
@@ -103,3 +104,5 @@ def time_logger(name, logger=None):
             return res
         return temp
     return wrapper
+
+basic_logger = get_logger_with_common_config()
